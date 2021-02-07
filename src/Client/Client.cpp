@@ -82,7 +82,7 @@ void Client::onConnectionAcceptance(NetworkEvent::Packet& packet)
 
     if (isAccecpted) {
         std::cout << "Connection accepted.\n";
-    }   
+    }
     else {
         std::string reason;
         packet.data >> reason;

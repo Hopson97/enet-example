@@ -1,7 +1,7 @@
 #pragma once
 
-#include "NetworkCommon.h"
-#include "NetworkHost.h"
+#include "../Common/NetworkCommon.h"
+#include "../Common/NetworkHost.h"
 #include <enet/enet.h>
 #include <iostream>
 
