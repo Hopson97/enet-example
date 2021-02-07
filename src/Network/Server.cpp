@@ -1,9 +1,8 @@
-#include "NetworkCommon.h"
-
 #include "Server.h"
 #include <SFML/Network/Packet.hpp>
 #include <iostream>
-#include <thread>
+#include "NetworkCommon.h"
+
 
 Server::Server()
     : m_host(4, 2)
@@ -70,20 +69,4 @@ void Server::onPlayerClick(sf::Packet& packet)
 
     packet >> id >> x >> y;
     std::cout << "Click at " << x << ", " << y << " from " << (int)id << std::endl;
-}
-
-int main()
-{
-    if (enet_initialize() != 0) {
-        return EXIT_FAILURE;
-    }
-
-    Server server;
-
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        server.tick();
-    }
-
-    enet_deinitialize();
 }

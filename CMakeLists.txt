@@ -5,14 +5,16 @@ project(recty VERSION 1.0)
 
 #Set executable for server
 add_executable(recty_server   
-    src/Server.cpp
-    src/NetworkHost.cpp
+    src/Network/Server.cpp
+    src/Network/NetworkHost.cpp
+    src/server_main.cpp
 )
 
 #Set executable for client
 add_executable(recty
-    src/Client.cpp
-    src/NetworkHost.cpp
+    src/Network/Client.cpp
+    src/Network/NetworkHost.cpp
+    src/main.cpp
 )
 
 #Set module path

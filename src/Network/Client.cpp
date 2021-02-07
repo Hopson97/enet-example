@@ -1,7 +1,4 @@
-#include "Keyboard.h"
-
 #include "Client.h"
-#include <SFML/Graphics/RenderWindow.hpp>
 
 Client::Client()
     : m_host(2)
@@ -78,55 +75,4 @@ void Client::sendPlayerClick(float x, float y)
     auto packet = makePacket(CommandToServer::PlayerClick);
     packet << m_playerId << x << y;
     m_serverConnection.send(packet);
-}
-
-int main()
-{
-    if (enet_initialize() != 0) {
-        return EXIT_FAILURE;
-    }
-
-    Client client;
-    if (!client.connectTo("192.168.0.20")) {
-        return -1;
-    }
-
-    sf::RenderWindow window({1280, 720}, "SFML");
-    window.setFramerateLimit(60);
-    window.setKeyRepeatEnabled(false);
-
-    Keyboard keyboard;
-
-    sf::Clock dt;
-    while (window.isOpen()) {
-        sf::Event e;
-        while (window.pollEvent(e)) {
-            keyboard.update(e);
-            switch (e.type) {
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-
-                case sf::Event::MouseButtonReleased:
-                    switch (e.mouseButton.button) {
-                        case sf::Mouse::Button::Left:
-                            client.sendPlayerClick(e.mouseButton.x, e.mouseButton.y);
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                default:
-                    break;
-            }
-        }
-
-        client.tick();
-
-        window.clear();
-        window.display();
-    }
-
-    enet_deinitialize();
 }
