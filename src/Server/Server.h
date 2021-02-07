@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common/NetworkHost.h"
+#include "../Network/NetworkHost.h"
 #include "ClientSession.h"
 #include <cstdint>
 #include <enet/enet.h>
