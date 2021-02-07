@@ -1,7 +1,7 @@
 #include "NetworkHost.h"
 
-#include <iostream>
 #include "NetCommon.h"
+#include <iostream>
 
 // Creates a server host
 NetworkHost::NetworkHost(unsigned maxConnections, unsigned channels)
@@ -9,7 +9,7 @@ NetworkHost::NetworkHost(unsigned maxConnections, unsigned channels)
     ENetAddress address;
 
     address.host = ENET_HOST_ANY;
-    address.port = 54321;
+    address.port = DEFAULT_PORT;
 
     m_handle = enet_host_create(&address, maxConnections, channels, 0, 0);
     if (!m_handle) {
@@ -26,7 +26,6 @@ NetworkHost::NetworkHost(unsigned channels)
     }
 }
 
-
 bool NetworkHost::pollEvent(NetworkEvent& event)
 {
     if (enet_host_service(m_handle, &event.handle, 0)) {
@@ -39,9 +38,10 @@ bool NetworkHost::pollEvent(NetworkEvent& event)
 }
 
 bool NetworkHost::connectTo(const char* ipAddress, NetworkConnection& outConnection)
-{
+{ 
     if (!m_handle) {
-        std::cerr << "The host is not created, unable to connect the client to a server.\n";
+        std::cerr
+            << "The host is not created, unable to connect the client to a server.\n";
         return false;
     }
     // Create address for the client to connect to
@@ -50,7 +50,6 @@ bool NetworkHost::connectTo(const char* ipAddress, NetworkConnection& outConnect
     if (enet_address_set_host(&address, ipAddress) != 0) {
         std::cerr << "Failed to create address.";
         return false;
-
     }
 
     // Connect to the server
@@ -58,7 +57,6 @@ bool NetworkHost::connectTo(const char* ipAddress, NetworkConnection& outConnect
     if (!outConnection.handle) {
         std::cerr << "Failed to connect to the server.";
         return false;
-
     }
 
     // Wait for a connection establishment
@@ -79,4 +77,10 @@ bool NetworkHost::connectTo(const char* ipAddress, NetworkConnection& outConnect
         return false;
     }
     return true;
+}
+
+void NetworkConnection::send(const sf::Packet& p, uint32_t flags, unsigned channel)
+{
+    ENetPacket* packet = enet_packet_create(p.getData(), p.getDataSize(), flags);
+    enet_peer_send(handle, channel, packet);
 }

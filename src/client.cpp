@@ -1,5 +1,6 @@
 #include "Keyboard.h"
 #include "NetCommon.h"
+#include "NetworkHost.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Network/IpAddress.hpp>
 #include <SFML/Network/Packet.hpp>
@@ -33,49 +34,28 @@ class Client {
     uint16_t m_playerId;
 
   private:
-    ENetHost* m_host = nullptr;
-    ENetPeer* m_serverConnection = nullptr;
+    NetworkHost m_host;
+    NetworkConnection m_serverConnection;
 
     ClientConnectState m_connectState = ClientConnectState::Pending;
 };
 
 Client::Client()
+    : m_host(2)
 {
-    m_host = enet_host_create(nullptr, 1, 1, 0, 0);
 }
 
 bool Client::connectTo(const std::string& ip)
 {
-    ENetAddress address;
-    ENetEvent event;
-
-    enet_address_set_host(&address, ip.c_str());
-    address.port = 54321;
-
-    m_serverConnection = enet_host_connect(m_host, &address, 1, 0);
-    if (!m_serverConnection) {
-        std::cerr << "Could not connect...\n";
-        return false;
-    }
-
-    if (enet_host_service(m_host, &event, 5000) > 0 &&
-        event.type == ENET_EVENT_TYPE_CONNECT) {
-        std::cout << "Connection succeeded.\n";
-        return true;
-    }
-    else {
-        enet_peer_reset(m_serverConnection);
-        puts("Connection failed.");
-        return false;
-    }
+    return m_host.connectTo(ip.c_str(), m_serverConnection);
 }
 
 void Client::tick()
 {
-    ENetEvent event;
-    while (enet_host_service(m_host, &event, 0) > 0) {
+    NetworkEvent event;
+    while (m_host.pollEvent(event)) {
         switch (event.type) {
-            case ENET_EVENT_TYPE_RECEIVE:
+            case NetworkEventType::Data:
                 handlePacket(event.packet);
                 enet_packet_destroy(event.packet);
                 break;
@@ -124,10 +104,7 @@ void Client::sendPlayerClick(float x, float y)
 {
     sf::Packet p;
     p << CommandToServer::PlayerClick << m_playerId << x << y;
-
-    ENetPacket* packet =
-        enet_packet_create(p.getData(), p.getDataSize(), ENET_PACKET_FLAG_RELIABLE);
-    enet_peer_send(m_serverConnection, 0, packet);
+    m_serverConnection.send(p);
 }
 
 int main()

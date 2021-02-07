@@ -1,4 +1,5 @@
 #include "NetCommon.h"
+#include "NetworkHost.h"
 #include <SFML/Network/Packet.hpp>
 #include <atomic>
 #include <cstdint>
@@ -17,7 +18,7 @@ struct Player {
 
 class Server {
   public:
-    Server(ENetHost* serverHost);
+    Server();
 
     void run();
 
@@ -31,11 +32,13 @@ class Server {
 
   private:
     std::vector<Player> m_players;
-    ENetHost* m_host;
+    // ENetHost* m_host;
+
+    NetworkHost m_host;
 };
 
-Server::Server(ENetHost* serverHost)
-    : m_host(serverHost)
+Server::Server()
+    : m_host(4, 2)
 {
 }
 
@@ -80,18 +83,20 @@ void Server::handlePacket(ENetPacket* packet)
 void Server::run()
 {
     while (true) {
-        ENetEvent event;
-        while (enet_host_service(m_host, &event, 0) > 0) {
-            // clang-format off
-            switch (event.type) {
-                case ENET_EVENT_TYPE_CONNECT:               onClientConnect(event.peer);    break;
-                case ENET_EVENT_TYPE_DISCONNECT:            onClientDisconnect(event.peer); break;
-                case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:    onClientDisconnect(event.peer); break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-                case ENET_EVENT_TYPE_RECEIVE:    
+        NetworkEvent event;
+        while (m_host.pollEvent(event)) {
+            // clang-format off
+            switch(event.type) {
+                case NetworkEventType::Connection:      onClientConnect(event.peer);    break;
+                case NetworkEventType::Disconnection:   onClientDisconnect(event.peer); break;
+                case NetworkEventType::Timeout:         onClientDisconnect(event.peer); break;
+                case NetworkEventType::Data:
                     handlePacket(event.packet);
                     enet_packet_destroy(event.packet);
                     break;
+
             }
             // clang-format on
         }
@@ -114,20 +119,7 @@ int main()
         return EXIT_FAILURE;
     }
 
-    ENetAddress address;
-    ENetHost* serverHost;
-
-    address.host = ENET_HOST_ANY;
-    address.port = 54321;
-
-    serverHost = enet_host_create(&address, 32, 1, 0, 0);
-    if (!serverHost) {
-        std::cerr << "Could not create server rip.\n";
-        return -1;
-    }
-    std::cout << "Starting server \n";
-
-    Server server(serverHost);
+    Server server;
     server.run();
 
     enet_deinitialize();

@@ -1,10 +1,15 @@
 #pragma once
 
+#include <SFML/Network/Packet.hpp>
 #include <enet/enet.h>
 #include <string>
-#include <SFML/Network/Packet.hpp>
 
-enum class NetworkEventType { Connection, Timeout, Disconnection, Data };
+enum class NetworkEventType {
+    Connection = 1,
+    Disconnection = 2,
+    Data = 3,
+    Timeout = 4,
+};
 
 struct NetworkEvent {
     ENetEvent handle;
@@ -18,7 +23,8 @@ struct NetworkConnection {
     ENetPeer* handle = nullptr;
     uint32_t salt;
 
-    void send(const sf::Packet& packet, unsigned channel = 0, uint32_t flags = 0);
+    void send(const sf::Packet& packet, uint32_t flags = ENET_PACKET_FLAG_RELIABLE,
+              unsigned channel = 0);
 };
 
 class NetworkHost {
@@ -32,7 +38,8 @@ class NetworkHost {
     /// @param channels The number of communication channels
     NetworkHost(unsigned channels);
 
-    /// @brief Poll network events into the event object, eg connections, packet recieves etc
+    /// @brief Poll network events into the event object, eg connections, packet recieves
+    /// etc
     /// @param event Objecto put the event details into
     /// @return true An event was received
     /// @return false No event was received
