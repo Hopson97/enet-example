@@ -1,6 +1,6 @@
+#include "Keyboard.h"
 #include "Network/Client.h"
 #include <SFML/Graphics/RenderWindow.hpp>
-#include "Keyboard.h"
 
 int main()
 {
