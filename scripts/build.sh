@@ -39,5 +39,4 @@ else
     cp bin/debug/recty_server recty/recty_server
 fi
 
-ls
 cp -R res recty/res
