@@ -82,6 +82,7 @@ void Client::onConnectionAcceptance(NetworkEvent::Packet& packet)
 
     if (isAccecpted) {
         std::cout << "Connection accepted.\n";
+        packet.data >> m_playerId;
     }
     else {
         std::string reason;

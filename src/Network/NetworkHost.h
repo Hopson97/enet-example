@@ -29,8 +29,6 @@ struct NetworkEvent {
 
 struct NetworkConnection {
     ENetPeer* handle = nullptr;
-    uint32_t salt;
-
     void send(const sf::Packet& packet, uint32_t flags = ENET_PACKET_FLAG_RELIABLE,
               unsigned channel = 0);
 };
