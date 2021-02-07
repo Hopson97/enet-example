@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+constexpr static uint16_t DEFAULT_PORT = 54123;
+
 /**
  * @brief Network messages from the client sending to server
  */

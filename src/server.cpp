@@ -80,39 +80,20 @@ void Server::handlePacket(ENetPacket* packet)
 void Server::run()
 {
     while (true) {
-
-        //  ENetPacket* packet = enet_packet_create("yee", 4, ENET_PACKET_FLAG_RELIABLE);
-
-        //    for (auto& p : peers) {
-        //        enet_peer_send(p.peer, 0, packet);
-        //    }
-
         ENetEvent event;
         while (enet_host_service(m_host, &event, 0) > 0) {
+            // clang-format off
             switch (event.type) {
-                case ENET_EVENT_TYPE_CONNECT:
-                    onClientConnect(event.peer);
-                    break;
+                case ENET_EVENT_TYPE_CONNECT:               onClientConnect(event.peer);    break;
+                case ENET_EVENT_TYPE_DISCONNECT:            onClientDisconnect(event.peer); break;
+                case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:    onClientDisconnect(event.peer); break;
 
-                case ENET_EVENT_TYPE_DISCONNECT:
-                    onClientDisconnect(event.peer);
-                    break;
-
-                case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-                    onClientDisconnect(event.peer);
-                    break;
-
-                case ENET_EVENT_TYPE_RECEIVE:
+                case ENET_EVENT_TYPE_RECEIVE:    
                     handlePacket(event.packet);
-
                     enet_packet_destroy(event.packet);
                     break;
-
-                default:
-                    std::cout << "Unknown event. " << event.type << std::endl;
-                    ;
-                    break;
             }
+            // clang-format on
         }
     }
 }
