@@ -2,6 +2,8 @@
 
 Client::Client()
     : m_host(2)
+    , m_salt(generateSalt())
+
 {
 }
 
@@ -21,7 +23,15 @@ void Client::disconnect()
 
 bool Client::connectTo(const std::string& ip)
 {
-    return m_host.connectTo(ip.c_str(), m_serverConnection);
+    bool isConnected = m_host.connectTo(ip.c_str(), m_serverConnection);
+    if (isConnected) {
+        m_connectState = ClientConnectState::Pending;
+
+        auto handshake = makePacket(CommandToServer::Handshake, m_salt);
+        m_serverConnection.send(handshake);
+        std::cout << "Sending handshake to server.\n";
+    }
+    return isConnected;
 }
 
 void Client::tick()
@@ -47,32 +57,42 @@ bool Client::isConnected() const
 
 void Client::handlePacket(NetworkEvent::Packet& packet)
 {
-    sf::Packet& data = packet.data;
+    using CTC = CommandToClient;
 
     // clang-format off
-    switch (static_cast<CommandToClient>(packet.command)) {
-        case CommandToClient::PlayerId:         onPlayerId(data);          break;
-        case CommandToClient::PlayerPositions:  onPlayerPositions(data);   break; 
+    switch (static_cast<CTC>(packet.command)) {
+        case CTC::HandshakeChallenge:   onHandshakeChallenge    (packet);   break;
+        case CTC::ConnectionAcceptance: onConnectionAcceptance  (packet);   break; 
     }
     // clang-format on
 }
 
-void Client::onPlayerId(sf::Packet& packet)
+void Client::onHandshakeChallenge(NetworkEvent::Packet& packet)
 {
-    packet >> m_playerId;
-    m_connectState = ClientConnectState::Connected;
-    printf("Got player ID! %d", m_playerId);
+    m_salt ^= packet.salt;
+    auto response = makePacket(CommandToServer::HandshakeResponse, m_salt);
+    m_serverConnection.send(response);
+    std::cout << "Sending challenge response to server.\n";
 }
 
-void Client::onPlayerPositions(sf::Packet& packet)
+void Client::onConnectionAcceptance(NetworkEvent::Packet& packet)
 {
-    uint16_t count = 0;
-    packet >> count;
+    uint8_t isAccecpted;
+    packet.data >> isAccecpted;
+
+    if (isAccecpted) {
+        std::cout << "Connection accepted.\n";
+    }   
+    else {
+        std::string reason;
+        packet.data >> reason;
+        std::cerr << "Rejected connection: " << reason << ".\n";
+    }
 }
 
 void Client::sendPlayerClick(float x, float y)
 {
-    auto packet = makePacket(CommandToServer::PlayerClick);
+    auto packet = makePacket(CommandToServer::PlayerClick, m_salt);
     packet << m_playerId << x << y;
     m_serverConnection.send(packet);
 }

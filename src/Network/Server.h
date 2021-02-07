@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ClientSession.h"
 #include "NetworkHost.h"
 #include <cstdint>
 #include <enet/enet.h>
@@ -22,12 +23,19 @@ class Server {
     void onClientConnect(ENetPeer* peer);
     void onClientDisconnect(ENetPeer* peer);
 
-    void handlePacket(NetworkEvent::Packet& packet);
-    void onPlayerClick(sf::Packet& packet);
+    void handlePacket(NetworkEvent::Packet& packet, ENetPeer* peer);
+
+    void onHandshake(NetworkEvent::Packet& packet, ENetPeer* peer);
+    void onHandshakeResponse(NetworkEvent::Packet& packet, ENetPeer* peer);
 
   private:
+    std::vector<PendingClientSession> m_pendingConnections;
+
     std::vector<Player> m_players;
     // ENetHost* m_host;
 
     NetworkHost m_host;
+
+    // Used for auth stuff
+    uint32_t m_salt;
 };
