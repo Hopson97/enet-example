@@ -7,6 +7,7 @@ project(recty VERSION 1.0)
 add_executable(recty_server   
     src/Network/Server.cpp
     src/Network/NetworkHost.cpp
+    src/Network/ClientSession.cpp
     src/server_main.cpp
 )
 

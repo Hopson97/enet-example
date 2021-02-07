@@ -3,6 +3,8 @@
 #include <SFML/Network/Packet.hpp>
 
 #include <cstdint>
+#include <ctime>
+#include <random>
 
 constexpr static uint16_t DEFAULT_PORT = 54123;
 
@@ -30,7 +32,7 @@ enum class CommandToServer : NetworkCommand_t {
     // Sends client salt to the server combined with the server's salt
     // -- Data --
     // u32: Client salt value
-    HandshakeChallengeResponse,
+    HandshakeResponse,
 
     // Sends position of a click to the server
     // - Data -
@@ -64,7 +66,12 @@ enum class CommandToClient : NetworkCommand_t {
     // u16: playerId
     // f32: x
     // f32: y
-
-    PlayerPositions
-
+    //PlayerPositions
 };
+
+inline uint32_t generateSalt()
+{
+    std::mt19937 rng(static_cast<unsigned>(std::time(nullptr)));
+    std::uniform_int_distribution<uint32_t> dist(0, 4294967290);
+    return dist(rng);
+}

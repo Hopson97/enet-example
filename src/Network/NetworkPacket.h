@@ -3,12 +3,13 @@
 #include "NetworkCommon.h"
 #include "enet/enet.h"
 #include <SFML/Network/Packet.hpp>
+#include <cstdint>
 
 template <typename Command>
-sf::Packet makePacket(Command command)
+sf::Packet makePacket(Command command, uint32_t salt)
 {
     sf::Packet packet;
-    packet << command;
+    packet << command << salt;
     return packet;
 }
 

@@ -16,6 +16,7 @@ struct NetworkEvent {
     struct Packet {
         sf::Packet data;
         NetworkCommand_t command = 0;
+        uint32_t salt = 0;
     };
     ENetEvent handle;
     NetworkEventType type;
@@ -72,10 +73,6 @@ class NetworkHost {
     ///@return false
     bool disconnectClient(NetworkConnection& serverConnection);
 
-    // Used for auth stuff
-    const uint32_t salt;
-
   private:
     ENetHost* m_handle = nullptr;
-    bool m_isClient;
 };

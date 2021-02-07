@@ -34,8 +34,8 @@ class Client {
   private:
     void handlePacket(NetworkEvent::Packet& packet);
 
-    void onPlayerId(sf::Packet& packet);
-    void onPlayerPositions(sf::Packet& packet);
+    void onHandshakeChallenge(NetworkEvent::Packet& packet);
+    void onConnectionAcceptance(NetworkEvent::Packet& packet);
 
   public:
     uint16_t m_playerId;
@@ -45,4 +45,7 @@ class Client {
     NetworkConnection m_serverConnection;
 
     ClientConnectState m_connectState = ClientConnectState::Pending;
+
+    // Used for auth stuff
+    uint32_t m_salt;
 };
