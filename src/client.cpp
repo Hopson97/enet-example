@@ -1,5 +1,5 @@
 #include "Keyboard.h"
-#include "NetCommon.h"
+#include "NetworkCommon.h"
 #include "NetworkHost.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Network/IpAddress.hpp>

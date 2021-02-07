@@ -1,4 +1,5 @@
-#include "NetCommon.h"
+#include "NetworkCommon.h"
+
 #include "NetworkHost.h"
 #include <SFML/Network/Packet.hpp>
 #include <atomic>

@@ -1,6 +1,6 @@
 #include "NetworkHost.h"
 
-#include "NetCommon.h"
+#include "NetworkCommon.h"
 #include <cassert>
 #include <iostream>
 
