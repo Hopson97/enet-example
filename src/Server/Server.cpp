@@ -28,20 +28,6 @@ void Server::onClientConnect(ENetPeer* peer)
     PendingClientSession session;
     session.connection.handle = peer;
     m_pendingConnections.push_back(session);
-
-    /*
-        Player player;
-        player.id = m_players.size() * 10;
-        player.peer = peer;
-        m_players.push_back(player);
-
-        //auto p = makePacket(CommandToClient::PlayerId, m_salt);
-        //p << player.id;
-
-        ENetPacket* packet =
-            enet_packet_create(p.getData(), p.getDataSize(), ENET_PACKET_FLAG_RELIABLE);
-        enet_peer_send(peer, 0, packet);
-        */
 }
 
 void Server::onClientDisconnect(ENetPeer* peer)
