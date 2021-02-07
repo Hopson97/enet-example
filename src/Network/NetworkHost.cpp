@@ -3,10 +3,22 @@
 #include "NetworkCommon.h"
 #include "NetworkPacket.h"
 #include <cassert>
+#include <ctime>
 #include <iostream>
+#include <random>
+
+namespace {
+    uint32_t generateSalt()
+    {
+        std::mt19937 rng(static_cast<unsigned>(std::time(nullptr)));
+        std::uniform_int_distribution<uint32_t> dist(0, 4294967290);
+        return dist(rng);
+    }
+} // namespace
 
 // Creates a server host
 NetworkHost::NetworkHost(unsigned maxConnections, unsigned channels)
+    : salt(generateSalt())
 {
     ENetAddress address;
 
@@ -21,6 +33,7 @@ NetworkHost::NetworkHost(unsigned maxConnections, unsigned channels)
 
 // Creates a client host
 NetworkHost::NetworkHost(unsigned channels)
+    : salt(generateSalt())
 {
     m_handle = enet_host_create(nullptr, 1, channels, 0, 0);
     if (!m_handle) {
