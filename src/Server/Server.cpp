@@ -1,8 +1,19 @@
 #include "Server.h"
-#include "../Common/NetworkCommon.h"
+#include "../Network/NetworkCommon.h"
 #include <SFML/Network/Packet.hpp>
 #include <algorithm>
 #include <iostream>
+
+namespace {
+    auto findPeer(std::vector<PendingClientSession>& pendingSessions, uint32_t incomingId)
+    {
+        return std::find_if(pendingSessions.begin(), pendingSessions.end(),
+                            [&](const auto& peer) {
+                                auto pendingId = peer.connection.handle->incomingPeerID;
+                                return pendingId == incomingId;
+                            });
+    }
+} // namespace
 
 Server::Server()
     : m_host(4, 2)
@@ -70,17 +81,6 @@ void Server::handlePacket(NetworkEvent::Packet& packet, ENetPeer* peer)
     }
     // clang-format on
 }
-
-namespace {
-    auto findPeer(std::vector<PendingClientSession>& pendingSessions, uint32_t incomingId)
-    {
-        return std::find_if(pendingSessions.begin(), pendingSessions.end(),
-                            [&](const auto& peer) {
-                                auto pendingId = peer.connection.handle->incomingPeerID;
-                                return pendingId == incomingId;
-                            });
-    }
-} // namespace
 
 void Server::onHandshake(NetworkEvent::Packet& packet, ENetPeer* peer)
 {

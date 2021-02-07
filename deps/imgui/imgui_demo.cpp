@@ -2564,7 +2564,7 @@ static void ShowDemoWindowPopups()
 
     if (ImGui::TreeNode("Context menus"))
     {
-        // BeginPopupContextItem() is a helper to provide common/simple popup behavior of essentially doing:
+        // BeginPopupContextItem() is a helper to provide Network/simple popup behavior of essentially doing:
         //    if (IsItemHovered() && IsMouseReleased(0))
         //       OpenPopup(id);
         //    return BeginPopup(id);

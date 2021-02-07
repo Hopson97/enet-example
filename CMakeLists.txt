@@ -5,7 +5,7 @@ project(recty VERSION 1.0)
 
 #Set executable for server
 add_executable(recty_server   
-    src/Common/NetworkHost.cpp
+    src/Network/NetworkHost.cpp
 
     src/Server/Server.cpp
     src/Server/ClientSession.cpp
@@ -15,7 +15,7 @@ add_executable(recty_server
 
 #Set executable for client
 add_executable(recty
-    src/Common/NetworkHost.cpp
+    src/Network/NetworkHost.cpp
 
     src/Client/Client.cpp
 
