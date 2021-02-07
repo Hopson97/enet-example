@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../Common/NetworkHost.h"
 #include "ClientSession.h"
-#include "NetworkHost.h"
 #include <cstdint>
 #include <enet/enet.h>
 #include <vector>

@@ -1,5 +1,5 @@
 #include "Server.h"
-#include "NetworkCommon.h"
+#include "../Common/NetworkCommon.h"
 #include <SFML/Network/Packet.hpp>
 #include <algorithm>
 #include <iostream>

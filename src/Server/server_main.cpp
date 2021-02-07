@@ -1,4 +1,4 @@
-#include "Network/Server.h"
+#include "Server.h"
 #include <thread>
 
 int main()

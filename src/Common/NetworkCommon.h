@@ -66,7 +66,7 @@ enum class CommandToClient : NetworkCommand_t {
     // u16: playerId
     // f32: x
     // f32: y
-    //PlayerPositions
+    // PlayerPositions
 };
 
 inline uint32_t generateSalt()

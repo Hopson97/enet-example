@@ -1,5 +1,5 @@
+#include "Client.h"
 #include "Keyboard.h"
-#include "Network/Client.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 
 int main()
