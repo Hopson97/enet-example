@@ -38,12 +38,19 @@ class NetworkHost {
     /// @param channels The number of communication channels
     NetworkHost(unsigned channels);
 
+    NetworkHost(const NetworkHost&) = delete;
+    NetworkHost(NetworkHost&&) = delete;
+    NetworkHost& operator=(const NetworkHost&) = delete;
+    NetworkHost& operator=(NetworkHost&&) = delete;
+    ~NetworkHost();
+
     /// @brief Poll network events into the event object, eg connections, packet recieves
     /// etc
-    /// @param event Objecto put the event details into
+    /// @param event Object to put the event details into
+    /// @param timeout Time to wait for an event, default = 0
     /// @return true An event was received
     /// @return false No event was received
-    bool pollEvent(NetworkEvent& event);
+    bool pollEvent(NetworkEvent& event, unsigned timeout = 0);
 
     /// @brief Connects the client host to a server
     /// @param ipAddress Server IP Address
@@ -52,6 +59,13 @@ class NetworkHost {
     /// @return false Connection was a failure
     bool connectTo(const char* ipAddress, NetworkConnection& outConnection);
 
+    ///@brief Disconnects client from the server
+    ///@param serverConnection The server connection to disconnect from
+    ///@return true
+    ///@return false
+    bool disconnectClient(NetworkConnection& serverConnection);
+
   private:
     ENetHost* m_handle = nullptr;
+    bool m_isClient;
 };

@@ -18,6 +18,16 @@ class Client {
   public:
     Client();
 
+    Client(const Client&) = delete;
+    Client(Client&&) = delete;
+    Client& operator=(const Client&) = delete;
+    Client& operator=(Client&&) = delete;
+
+    ~Client();
+
+    /// @brief Disconnect the client from the server
+    void disconnect();
+
     bool connectTo(const std::string& ip);
     void tick();
     bool isConnected() const;
@@ -43,6 +53,20 @@ class Client {
 Client::Client()
     : m_host(2)
 {
+}
+
+Client::~Client()
+{
+    disconnect();
+}
+
+void Client::disconnect()
+{
+    if (m_connectState != ClientConnectState::Disconnected) {
+        if (m_host.disconnectClient(m_serverConnection)) {
+            m_connectState = ClientConnectState::Disconnected;
+        }
+    }
 }
 
 bool Client::connectTo(const std::string& ip)

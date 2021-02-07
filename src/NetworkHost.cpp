@@ -1,6 +1,7 @@
 #include "NetworkHost.h"
 
 #include "NetCommon.h"
+#include <cassert>
 #include <iostream>
 
 // Creates a server host
@@ -26,9 +27,17 @@ NetworkHost::NetworkHost(unsigned channels)
     }
 }
 
-bool NetworkHost::pollEvent(NetworkEvent& event)
+NetworkHost::~NetworkHost()
 {
-    if (enet_host_service(m_handle, &event.handle, 0)) {
+    if (m_handle) {
+        enet_host_destroy(m_handle);
+    }
+}
+
+bool NetworkHost::pollEvent(NetworkEvent& event, unsigned timeout)
+{
+    assert(m_handle);
+    if (enet_host_service(m_handle, &event.handle, timeout)) {
         event.type = static_cast<NetworkEventType>(event.handle.type);
         event.packet = event.handle.packet;
         event.peer = event.handle.peer;
@@ -38,12 +47,9 @@ bool NetworkHost::pollEvent(NetworkEvent& event)
 }
 
 bool NetworkHost::connectTo(const char* ipAddress, NetworkConnection& outConnection)
-{ 
-    if (!m_handle) {
-        std::cerr
-            << "The host is not created, unable to connect the client to a server.\n";
-        return false;
-    }
+{
+    assert(m_handle);
+
     // Create address for the client to connect to
     ENetAddress address{};
     address.port = DEFAULT_PORT;
@@ -79,8 +85,29 @@ bool NetworkHost::connectTo(const char* ipAddress, NetworkConnection& outConnect
     return true;
 }
 
+bool NetworkHost::disconnectClient(NetworkConnection& serverConnection)
+{
+    assert(m_handle);
+    assert(serverConnection.handle);
+    enet_peer_disconnect(serverConnection.handle, 0);
+
+    ENetEvent event;
+    while (enet_host_service(m_handle, &event, 2000) > 0) {
+        if (event.type == ENET_EVENT_TYPE_RECEIVE) {
+            enet_packet_destroy(event.packet);
+        }
+        else if (event.type == ENET_EVENT_TYPE_DISCONNECT) {
+            enet_host_flush(m_handle);
+            return true;
+        }
+    }
+    enet_peer_reset(serverConnection.handle);
+    return false;
+}
+
 void NetworkConnection::send(const sf::Packet& p, uint32_t flags, unsigned channel)
 {
+    assert(handle);
     ENetPacket* packet = enet_packet_create(p.getData(), p.getDataSize(), flags);
     enet_peer_send(handle, channel, packet);
 }
