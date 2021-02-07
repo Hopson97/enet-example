@@ -38,7 +38,7 @@ class Client {
     void onConnectionAcceptance(NetworkEvent::Packet& packet);
 
   public:
-    uint16_t m_playerId;
+    uint32_t m_playerId;
 
   private:
     NetworkHost m_host;

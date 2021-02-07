@@ -16,7 +16,7 @@ namespace {
 } // namespace
 
 Server::Server()
-    : m_host(4, 2)
+    : m_host(MAX_CONNECTIONS, 2)
 
 {
 }
@@ -46,8 +46,23 @@ void Server::onClientConnect(ENetPeer* peer)
 
 void Server::onClientDisconnect(ENetPeer* peer)
 {
-    std::cout << "A client disconnected\n";
-    std::cout << peer->incomingPeerID << std::endl;
+    auto itr = m_clientsMap.find(peer->incomingPeerID);
+    if (itr != m_clientsMap.end()) {
+
+        auto index = itr->second;
+        m_clients[index].disconnect();
+        std::cout << "A client disconnected: " << m_clients[index].getPlayerId() << ".\n";
+
+        // TODO m_world.removeEntity(m_clients[index].getPlayerId());
+        // TODO broadcastPlayerLeave(m_clients[index].getPlayerId());
+        m_clientsMap.erase(itr);
+    }
+    else {
+        auto pending = findPeer(m_pendingConnections, peer->incomingPeerID);
+        if (pending != m_pendingConnections.end()) {
+            m_pendingConnections.erase(pending);
+        }
+    }
 }
 
 void Server::tick()
@@ -69,18 +84,43 @@ void Server::tick()
     }
 }
 
+int Server::createClientSession(ENetPeer* peer, uint32_t salt)
+{
+    for (unsigned i = 0; i < m_clients.size(); i++) {
+        if (!m_clients[i].isActive()) {
+            std::cout << "Created client session for player ID " << i << ".\n";
+            uint32_t playerId = i; // TODO = m_world.addEntity();
+            m_clients[i].init(peer, salt, playerId);
+            m_clientsMap[peer->incomingPeerID] = i;
+            // TODO broadcastPlayerJoin(playerId);
+            return i;
+        }
+    }
+    return -1;
+}
+
+// clang-format off
 void Server::handlePacket(NetworkEvent::Packet& packet, ENetPeer* peer)
 {
     using CTS = CommandToServer;
 
-    // clang-format off
-    switch (static_cast<CommandToServer>(packet.command)) {
-        case CTS::PlayerClick:  /*      onPlayerClick(data, peer); */ break;
-        case CTS::Handshake:            onHandshake(packet, peer);        break;
-        case CTS::HandshakeResponse:    onHandshakeResponse(packet, peer);      break;
+    switch (static_cast<CTS>(packet.command)) {
+        case CTS::PlayerClick:          onPlayerClick(packet, peer);        break;
+        case CTS::Handshake:            onHandshake(packet, peer);          break;
+        case CTS::HandshakeResponse:    onHandshakeResponse(packet, peer);  break;
     }
-    // clang-format on
 }
+
+#define AUTHENTICATE_PACKET                             \
+    auto itr = m_clientsMap.find(peer->incomingPeerID); \
+    if (itr == m_clientsMap.end()) {                    \
+        return;                                         \
+    }                                                   \
+    auto& client = m_clients.at(itr->second);           \
+    if (!client.verify(packet.salt)) {                  \
+        return;                                         \
+    }
+// clang-format on
 
 void Server::onHandshake(NetworkEvent::Packet& packet, ENetPeer* peer)
 {
@@ -104,7 +144,15 @@ void Server::onHandshakeResponse(NetworkEvent::Packet& packet, ENetPeer* peer)
         if (pendingPeer->incomingPeerID == peer->incomingPeerID) {
             uint32_t salt = pending.salt ^ m_salt;
             if (salt == packet.salt) {
-                pending.sendAcceptConnection(m_players.size());
+
+                int slot = createClientSession(peer, salt);
+                if (slot > -1) {
+                    pending.sendAcceptConnection(m_clients[slot].getPlayerId());
+                    // TODO Send the game data as well...
+                }
+                else {
+                    pending.sendRejectConnection("Game is full");
+                }
             }
             else {
                 pending.sendRejectConnection("Auth failed");
@@ -115,14 +163,14 @@ void Server::onHandshakeResponse(NetworkEvent::Packet& packet, ENetPeer* peer)
     }
 }
 
-/*
-void Server::onPlayerClick(sf::Packet& packet)
+void Server::onPlayerClick(NetworkEvent::Packet& packet, ENetPeer* peer)
 {
-    uint16_t id = 0;
+    AUTHENTICATE_PACKET
+
+    uint32_t id = 0;
     float x = 0;
     float y = 0;
 
-    packet >> id >> x >> y;
+    packet.data >> id >> x >> y;
     std::cout << "Click at " << x << ", " << y << " from " << (int)id << std::endl;
 }
-*/
