@@ -1,6 +1,7 @@
 #include "NetworkHost.h"
 
 #include "NetworkCommon.h"
+#include "NetworkPacket.h"
 #include <cassert>
 #include <iostream>
 
@@ -39,8 +40,14 @@ bool NetworkHost::pollEvent(NetworkEvent& event, unsigned timeout)
     assert(m_handle);
     if (enet_host_service(m_handle, &event.handle, timeout)) {
         event.type = static_cast<NetworkEventType>(event.handle.type);
-        event.packet = event.handle.packet;
         event.peer = event.handle.peer;
+        event.enetPacket = event.handle.packet;
+
+        if (event.type == NetworkEventType::Data) {
+            event.packet.data.append(event.handle.packet->data,
+                                     event.handle.packet->dataLength + 1);
+            event.packet.data >> event.packet.command;
+        }
         return true;
     }
     return false;

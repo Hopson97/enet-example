@@ -6,10 +6,12 @@
 
 constexpr static uint16_t DEFAULT_PORT = 54123;
 
+using NetworkCommand_t = uint16_t;
+
 /**
  * @brief Network messages from the client sending to server
  */
-enum class CommandToServer {
+enum class CommandToServer : NetworkCommand_t {
     /**
      *  Sends position of a click to the server
      *  Format:
@@ -23,7 +25,7 @@ enum class CommandToServer {
 /**
  * @brief Network messages from the server sending to client
  */
-enum class CommandToClient {
+enum class CommandToClient : NetworkCommand_t {
 
     /**
      * Sends an UUID to a newly connected player
@@ -44,21 +46,3 @@ enum class CommandToClient {
     PlayerPositions
 
 };
-
-// Writes a command to a packet
-template <typename CommandType>
-sf::Packet& operator>>(sf::Packet& packet, CommandType& command)
-{
-    uint16_t commandId;
-    packet >> commandId;
-    command = static_cast<CommandType>(commandId);
-    return packet;
-}
-
-// Reads a command from a packet
-template <typename CommandType>
-sf::Packet& operator<<(sf::Packet& packet, CommandType command)
-{
-    packet << static_cast<uint16_t>(command);
-    return packet;
-}

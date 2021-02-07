@@ -27,8 +27,7 @@ class Server {
     void onClientConnect(ENetPeer* peer);
     void onClientDisconnect(ENetPeer* peer);
 
-    void handlePacket(ENetPacket* packet);
-
+    void handlePacket(NetworkEvent::Packet& packet);
     void onPlayerClick(sf::Packet& packet);
 
   private:
@@ -51,8 +50,8 @@ void Server::onClientConnect(ENetPeer* peer)
     player.peer = peer;
     m_players.push_back(player);
 
-    sf::Packet p;
-    p << CommandToClient::PlayerId << player.id;
+    auto p = makePacket(CommandToClient::PlayerId);
+    p << player.id;
 
     ENetPacket* packet =
         enet_packet_create(p.getData(), p.getDataSize(), ENET_PACKET_FLAG_RELIABLE);
@@ -61,22 +60,16 @@ void Server::onClientConnect(ENetPeer* peer)
 
 void Server::onClientDisconnect(ENetPeer* peer)
 {
-    std::cout << "A client disconnected\n" << peer->eventData << std::endl;
+    std::cout << "A client disconnected\n";
 }
 
-void Server::handlePacket(ENetPacket* packet)
+void Server::handlePacket(NetworkEvent::Packet& packet)
 {
-    printf("A packet of length %u containing %s was received\n",
-           (unsigned)packet->dataLength, packet->data);
-    sf::Packet p;
-    p.append(packet->data, packet->dataLength + 1);
-
-    CommandToServer cmd;
-    p >> cmd;
+    sf::Packet& data = packet.data;
 
     // clang-format off
-    switch (cmd) {
-        case CommandToServer::PlayerClick:  onPlayerClick(p);  break;
+    switch (static_cast<CommandToServer>(packet.command)) {
+        case CommandToServer::PlayerClick:  onPlayerClick(data);  break;
     }
     // clang-format on
 }
@@ -95,7 +88,7 @@ void Server::run()
                 case NetworkEventType::Timeout:         onClientDisconnect(event.peer); break;
                 case NetworkEventType::Data:
                     handlePacket(event.packet);
-                    enet_packet_destroy(event.packet);
+                    enet_packet_destroy(event.enetPacket);
                     break;
 
             }

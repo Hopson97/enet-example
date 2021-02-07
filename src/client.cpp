@@ -35,7 +35,7 @@ class Client {
     void sendPlayerClick(float x, float y);
 
   private:
-    void handlePacket(ENetPacket* packet);
+    void handlePacket(NetworkEvent::Packet& packet);
 
     void onPlayerId(sf::Packet& packet);
     void onPlayerPositions(sf::Packet& packet);
@@ -81,7 +81,7 @@ void Client::tick()
         switch (event.type) {
             case NetworkEventType::Data:
                 handlePacket(event.packet);
-                enet_packet_destroy(event.packet);
+                enet_packet_destroy(event.enetPacket);
                 break;
 
             default:
@@ -95,17 +95,14 @@ bool Client::isConnected() const
     return m_connectState == ClientConnectState::Connected;
 }
 
-void Client::handlePacket(ENetPacket* packet)
+void Client::handlePacket(NetworkEvent::Packet& packet)
 {
-    sf::Packet p;
-    p.append(packet->data, packet->dataLength + 1);
+    sf::Packet& data = packet.data;
 
-    CommandToClient cmd;
-    p >> cmd;
     // clang-format off
-    switch (cmd) {
-        case CommandToClient::PlayerId:         onPlayerId(p);          break;
-        case CommandToClient::PlayerPositions:  onPlayerPositions(p);   break; 
+    switch (static_cast<CommandToClient>(packet.command)) {
+        case CommandToClient::PlayerId:         onPlayerId(data);          break;
+        case CommandToClient::PlayerPositions:  onPlayerPositions(data);   break; 
     }
     // clang-format on
 }
@@ -120,15 +117,14 @@ void Client::onPlayerId(sf::Packet& packet)
 void Client::onPlayerPositions(sf::Packet& packet)
 {
     uint16_t count = 0;
-
     packet >> count;
 }
 
 void Client::sendPlayerClick(float x, float y)
 {
-    sf::Packet p;
-    p << CommandToServer::PlayerClick << m_playerId << x << y;
-    m_serverConnection.send(p);
+    auto packet = makePacket(CommandToServer::PlayerClick);
+    packet << m_playerId << x << y;
+    m_serverConnection.send(packet);
 }
 
 int main()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NetworkPacket.h"
 #include <SFML/Network/Packet.hpp>
 #include <enet/enet.h>
 #include <string>
@@ -12,11 +13,17 @@ enum class NetworkEventType {
 };
 
 struct NetworkEvent {
+    struct Packet {
+        sf::Packet data;
+        NetworkCommand_t command = 0;
+    };
     ENetEvent handle;
     NetworkEventType type;
 
-    ENetPacket* packet;
+    NetworkEvent::Packet packet;
+
     ENetPeer* peer;
+    ENetPacket* enetPacket;
 };
 
 struct NetworkConnection {
