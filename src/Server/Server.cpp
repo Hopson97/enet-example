@@ -42,6 +42,9 @@ void Server::stop()
 
 void Server::tick()
 {
+    
+    broadcastPlayerPositions();
+
     NetworkEvent event;
     while (m_host.pollEvent(event)) {
         // clang-format off
@@ -184,4 +187,12 @@ void Server::onPlayerClick(NetworkEvent::Packet& packet, ENetPeer* peer)
 
     packet.data >> id >> x >> y;
     std::cout << "Click at " << x << ", " << y << " from " << (int)id << std::endl;
+}
+
+void Server::broadcastPlayerPositions()
+{
+    auto packet = makePacket(CommandToClient::PlayerPositions, m_salt);
+
+    packet << static_cast<uint16_t>(m_clientsMap.size());
+    broadcast(packet);
 }

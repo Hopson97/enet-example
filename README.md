@@ -1,6 +1,14 @@
-# recty
+# enet experiments
 
-description here
+Just playing around with enet.
+
+Meant to be a reference project for other projects of mine to work from.
+
+TODO:
+
+* Lua stuff
+* Render something
+* more stuff
 
 ## Building and Running
 
