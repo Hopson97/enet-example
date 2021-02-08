@@ -40,6 +40,11 @@ void Server::stop()
     }
 }
 
+// ================================================
+//
+//          NETWORK EVENT HANDLING
+//
+// =================================================
 void Server::tick()
 {
     
@@ -62,12 +67,6 @@ void Server::tick()
     }
 }
 
-void Server::broadcast(const sf::Packet& packet)
-{
-    for (auto& client : m_clients) {
-        client.send(packet);
-    }
-}
 
 void Server::onClientConnect(ENetPeer* peer)
 {
@@ -116,6 +115,31 @@ int Server::createClientSession(ENetPeer* peer, uint32_t salt)
     return -1;
 }
 
+// ================================================
+//
+//          PACKET SENDING/ BROADCASTING
+//
+// =================================================
+void Server::broadcast(const sf::Packet& packet)
+{
+    for (auto& client : m_clients) {
+        client.send(packet);
+    }
+}
+
+void Server::broadcastPlayerPositions()
+{
+    auto packet = makePacket(CommandToClient::PlayerPositions, m_salt);
+
+    packet << static_cast<uint16_t>(m_clientsMap.size());
+    broadcast(packet);
+}
+
+// ================================================
+//
+//          PACKET HANDLING FUNCTIONS
+//
+// =================================================
 // clang-format off
 void Server::handlePacket(NetworkEvent::Packet& packet, ENetPeer* peer)
 {
@@ -187,12 +211,4 @@ void Server::onPlayerClick(NetworkEvent::Packet& packet, ENetPeer* peer)
 
     packet.data >> id >> x >> y;
     std::cout << "Click at " << x << ", " << y << " from " << (int)id << std::endl;
-}
-
-void Server::broadcastPlayerPositions()
-{
-    auto packet = makePacket(CommandToClient::PlayerPositions, m_salt);
-
-    packet << static_cast<uint16_t>(m_clientsMap.size());
-    broadcast(packet);
 }

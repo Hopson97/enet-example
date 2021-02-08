@@ -38,6 +38,16 @@ bool Client::connectTo(const std::string& ip)
     return isConnected;
 }
 
+bool Client::isConnected() const
+{
+    return m_connectState != ClientConnectState::Disconnected;
+}
+
+// ================================================
+//
+//          NETWORK EVENT HANDLING
+//
+// =================================================
 void Client::tick()
 {
     NetworkEvent event;
@@ -54,11 +64,24 @@ void Client::tick()
     }
 }
 
-bool Client::isConnected() const
+// ================================================
+//
+//          PACKET SENDING/ BROADCASTING
+//
+// =================================================
+void Client::sendPlayerClick(float x, float y)
 {
-    return m_connectState != ClientConnectState::Disconnected;
+    auto packet = makePacket(CommandToServer::PlayerClick, m_salt);
+    packet << m_playerId << x << y;
+    m_serverConnection.send(packet);
 }
 
+
+// ================================================
+//
+//          PACKET HANDLING FUNCTIONS
+//
+// =================================================
 void Client::handlePacket(NetworkEvent::Packet& packet)
 {
     using CTC = CommandToClient;
@@ -120,12 +143,4 @@ void onPlayerPositions(NetworkEvent::Packet& packet)
 
     packet.data >> count;
 
-}
-
-
-void Client::sendPlayerClick(float x, float y)
-{
-    auto packet = makePacket(CommandToServer::PlayerClick, m_salt);
-    packet << m_playerId << x << y;
-    m_serverConnection.send(packet);
 }
