@@ -27,6 +27,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 
 #Find libraries
 find_package(Threads)
+find_package(OpenGL REQUIRED)
 find_package(SFML REQUIRED audio network graphics window system)
 
 add_subdirectory(deps/imgui)
@@ -63,7 +64,7 @@ target_link_libraries(recty_server
     enet
     lua
     Threads::Threads 
-    ${SFML_LIBRARIES} 
+    ${SFML_LIBRARIES}
     ${SFML_DEPENDENCIES}
 )
 
@@ -73,6 +74,7 @@ target_link_libraries(recty
     imgui
     imgui_sfml
     Threads::Threads 
+    ${OPENGL_LIBRARIES} 
     ${SFML_LIBRARIES} 
     ${SFML_DEPENDENCIES}
 )
