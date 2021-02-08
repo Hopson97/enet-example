@@ -1,5 +1,11 @@
 #include "ClientSession.h"
 
+
+// ================================================================
+//
+//        P E N D I N G  C L I E N T    S E S S I O N
+//
+// ================================================================
 void PendingClientSession::sendHandshakeChallenge(uint32_t serversalt)
 {
     auto packet = makePacket(CommandToClient::HandshakeChallenge, serversalt);
