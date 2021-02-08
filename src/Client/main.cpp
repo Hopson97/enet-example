@@ -46,6 +46,11 @@ int main()
 
         client.tick();
 
+        if (!client.isConnected()) {
+            window.close();
+            break;
+        }
+
         window.clear();
         window.display();
     }

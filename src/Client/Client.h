@@ -38,6 +38,7 @@ class Client {
     void onConnectionAcceptance(NetworkEvent::Packet& packet);
 
     void onPlayerJoin(NetworkEvent::Packet& packet);
+    void onForceExit(NetworkEvent::Packet& packet);
 
   public:
     uint32_t m_playerId;

@@ -51,7 +51,7 @@ void Client::tick()
 
 bool Client::isConnected() const
 {
-    return m_connectState == ClientConnectState::Connected;
+    return m_connectState != ClientConnectState::Disconnected;
 }
 
 void Client::handlePacket(NetworkEvent::Packet& packet)
@@ -63,7 +63,8 @@ void Client::handlePacket(NetworkEvent::Packet& packet)
         case CTC::HandshakeChallenge:   onHandshakeChallenge    (packet);   break;
         case CTC::ConnectionAcceptance: onConnectionAcceptance  (packet);   break; 
 
-        case CTC::PlayerJoined:         onPlayerJoin            (packet);   break; 
+        case CTC::PlayerJoined:         onPlayerJoin    (packet);   break; 
+        case CTC::ForceExit:            onForceExit     (packet);   break; 
     }
     // clang-format on
 }
@@ -98,7 +99,13 @@ void Client::onPlayerJoin(NetworkEvent::Packet& packet)
     std::cout << "Player joined with ID " << id << ".\n";
 }
 
-
+void Client::onForceExit(NetworkEvent::Packet& packet)
+{
+    std::string reason;
+    packet.data >> reason;
+    std::cout << "Force exit recieved. Reason: " << reason << "\n";
+    m_connectState = ClientConnectState::Disconnected;
+}
 
 void Client::sendPlayerClick(float x, float y)
 {

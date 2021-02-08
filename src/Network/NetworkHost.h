@@ -71,6 +71,8 @@ class NetworkHost {
     ///@return false
     bool disconnectClient(NetworkConnection& serverConnection);
 
+    void flush();
+
   private:
     ENetHost* m_handle = nullptr;
 };

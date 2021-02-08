@@ -64,6 +64,11 @@ enum class CommandToClient : NetworkCommand_t {
     // u32 The player ID
     PlayerJoined,
 
+    // Forces a player to exit the game/ disconnect from the server
+    // -- Data --
+    // std::string The reason to kick/force a player to exit
+    ForceExit,
+
     // Sends position of all player to the clients
     // -- Data --
     // u32: playerCount

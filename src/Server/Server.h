@@ -3,6 +3,7 @@
 #include "../Network/NetworkHost.h"
 #include "ClientSession.h"
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <enet/enet.h>
 #include <unordered_map>
@@ -13,7 +14,14 @@ constexpr static unsigned MAX_CONNECTIONS = 4;
 class Server {
   public:
     Server();
+    Server(const Server&) = delete;
+    Server(Server&&) = delete;
+    Server& operator=(const Server&) = delete;
+    Server& operator=(Server&&) = delete;
 
+    ~Server();
+
+    void stop();
     void tick();
 
   private:

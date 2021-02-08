@@ -21,13 +21,48 @@ Server::Server()
 {
 }
 
+Server::~Server()
+{
+    stop();
+}
+
+void Server::stop()
+{
+    std::cout << "Bye bye server\n";
+    sf::Packet broadcaster = makePacket(CommandToClient::ForceExit, m_salt);
+    broadcaster << "Server shutting down.";
+    broadcast(broadcaster);
+    m_host.flush();
+    for (auto& client : m_clients) {
+        client.disconnect();
+    }
+}
+
+void Server::tick()
+{
+    NetworkEvent event;
+    while (m_host.pollEvent(event)) {
+        // clang-format off
+        switch(event.type) {
+            case NetworkEventType::Connection:      onClientConnect(event.peer);    break;
+            case NetworkEventType::Disconnection:   onClientDisconnect(event.peer); break;
+            case NetworkEventType::Timeout:         onClientDisconnect(event.peer); break;
+            case NetworkEventType::Data:
+                handlePacket(event.packet, event.peer);
+                enet_packet_destroy(event.enetPacket);
+                break;
+
+        }
+        // clang-format on
+    }
+}
+
 void Server::broadcast(const sf::Packet& packet)
 {
     for (auto& client : m_clients) {
         client.send(packet);
     }
 }
-
 
 void Server::onClientConnect(ENetPeer* peer)
 {
@@ -57,32 +92,12 @@ void Server::onClientDisconnect(ENetPeer* peer)
     }
 }
 
-void Server::tick()
-{
-    NetworkEvent event;
-    while (m_host.pollEvent(event)) {
-        // clang-format off
-        switch(event.type) {
-            case NetworkEventType::Connection:      onClientConnect(event.peer);    break;
-            case NetworkEventType::Disconnection:   onClientDisconnect(event.peer); break;
-            case NetworkEventType::Timeout:         onClientDisconnect(event.peer); break;
-            case NetworkEventType::Data:
-                handlePacket(event.packet, event.peer);
-                enet_packet_destroy(event.enetPacket);
-                break;
-
-        }
-        // clang-format on
-    }
-}
-
 int Server::createClientSession(ENetPeer* peer, uint32_t salt)
 {
     for (unsigned i = 0; i < m_clients.size(); i++) {
         if (!m_clients[i].isActive()) {
             std::cout << "Created client session for player ID " << i << ".\n\n";
             uint32_t playerId = i; // TODO = m_world.addEntity();
-
 
             sf::Packet broadcaster = makePacket(CommandToClient::PlayerJoined, m_salt);
             broadcaster << playerId;

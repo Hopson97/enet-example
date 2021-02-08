@@ -114,6 +114,12 @@ bool NetworkHost::disconnectClient(NetworkConnection& serverConnection)
     return false;
 }
 
+void NetworkHost::flush()
+{
+    assert(m_handle);
+    enet_host_flush(m_handle);
+}
+
 void NetworkConnection::send(const sf::Packet& p, uint32_t flags, unsigned channel)
 {
     assert(handle);
