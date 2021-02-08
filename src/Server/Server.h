@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Network/NetworkHost.h"
+#include "../World/World.h"
 #include "ClientSession.h"
 #include <array>
 #include <atomic>
@@ -9,11 +10,13 @@
 #include <unordered_map>
 #include <vector>
 
+struct World;
+
 constexpr static unsigned MAX_CONNECTIONS = 4;
 
 class Server {
   public:
-    Server();
+    Server(World& world);
     Server(const Server&) = delete;
     Server(Server&&) = delete;
     Server& operator=(const Server&) = delete;
@@ -51,4 +54,7 @@ class Server {
     NetworkHost m_host;
 
     uint32_t m_salt;
+
+    // World/ Game stuff
+    World& mp_world;
 };

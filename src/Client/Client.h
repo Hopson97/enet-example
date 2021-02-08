@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../Network/NetworkCommon.h"
 #include "../Network/NetworkHost.h"
 #include <enet/enet.h>
-#include <iostream>
+#include "../Network/NetworkCommands.h"
+
+struct World;
 
 enum class ClientConnectState {
     Pending,
@@ -13,7 +14,7 @@ enum class ClientConnectState {
 
 class Client {
   public:
-    Client();
+    Client(World& world);
 
     Client(const Client&) = delete;
     Client(Client&&) = delete;
@@ -39,9 +40,10 @@ class Client {
 
     void onPlayerJoin(NetworkEvent::Packet& packet);
     void onForceExit(NetworkEvent::Packet& packet);
+    void onPlayerPositions(NetworkEvent::Packet& packet);
 
   public:
-    uint32_t m_playerId;
+    PlayerId_t m_playerId;
 
   private:
     NetworkHost m_host;
@@ -51,4 +53,7 @@ class Client {
 
     // Used for auth stuff
     uint32_t m_salt;
+
+    // World/ Game stuff
+    World& mp_world;
 };

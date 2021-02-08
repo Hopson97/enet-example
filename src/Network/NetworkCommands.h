@@ -9,6 +9,7 @@
 constexpr static uint16_t DEFAULT_PORT = 54123;
 
 using NetworkCommand_t = uint16_t;
+using PlayerId_t = uint16_t;
 
 // Connection process:
 
@@ -36,7 +37,7 @@ enum class CommandToServer : NetworkCommand_t {
 
     // Sends position of a click to the server
     // - Data -
-    // u16: playerId
+    // PlayerId_t: playerId
     // f32: x
     // f32: y
     PlayerClick
@@ -61,7 +62,7 @@ enum class CommandToClient : NetworkCommand_t {
 
     // Sent when a player joins
     // -- Data --
-    // u32 The player ID
+    // PlayerId_t The player ID
     PlayerJoined,
 
     // Forces a player to exit the game/ disconnect from the server
@@ -73,10 +74,10 @@ enum class CommandToClient : NetworkCommand_t {
     // -- Data --
     // u32: playerCount
     // [for each playerCount]:
-    // u32: playerId
+    // PlayerId_t: playerId
     // f32: x
     // f32: y
-    // PlayerPositions
+    PlayerPositions
 };
 
 inline uint32_t generateSalt()

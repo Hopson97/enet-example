@@ -2,6 +2,7 @@
 #include <atomic>
 #include <iostream>
 #include <thread>
+#include "../World/World.h"
 
 int main()
 {
@@ -22,8 +23,11 @@ int main()
         }
     });
 
+
+
     std::cout << "Starting server.\n";
-    Server server;
+    World world;
+    Server server(world);
     while (isRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         server.tick();

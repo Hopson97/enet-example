@@ -1,6 +1,6 @@
 #include "NetworkHost.h"
 
-#include "NetworkCommon.h"
+#include "NetworkCommands.h"
 #include "NetworkPacket.h"
 #include <cassert>
 #include <ctime>

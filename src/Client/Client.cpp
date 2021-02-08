@@ -1,8 +1,13 @@
 #include "Client.h"
 
-Client::Client()
+#include <iostream>
+#include "../Network/NetworkCommands.h"
+#include "../World/World.h"
+
+Client::Client(World& world)
     : m_host(2)
     , m_salt(generateSalt())
+    , mp_world(world)
 
 {
 }
@@ -65,6 +70,7 @@ void Client::handlePacket(NetworkEvent::Packet& packet)
 
         case CTC::PlayerJoined:         onPlayerJoin    (packet);   break; 
         case CTC::ForceExit:            onForceExit     (packet);   break; 
+        case CTC::PlayerPositions:      onForceExit     (packet);   break; 
     }
     // clang-format on
 }
@@ -72,6 +78,7 @@ void Client::handlePacket(NetworkEvent::Packet& packet)
 void Client::onHandshakeChallenge(NetworkEvent::Packet& packet)
 {
     m_salt ^= packet.salt;
+    std::cout << "Salt: " << m_salt << std::endl;
     auto response = makePacket(CommandToServer::HandshakeResponse, m_salt);
     m_serverConnection.send(response);
 }
@@ -94,7 +101,7 @@ void Client::onConnectionAcceptance(NetworkEvent::Packet& packet)
 
 void Client::onPlayerJoin(NetworkEvent::Packet& packet)
 {
-    uint32_t id;
+    uint16_t id;
     packet.data >> id;
     std::cout << "Player joined with ID " << id << ".\n";
 }
@@ -106,6 +113,15 @@ void Client::onForceExit(NetworkEvent::Packet& packet)
     std::cout << "Force exit recieved. Reason: " << reason << "\n";
     m_connectState = ClientConnectState::Disconnected;
 }
+
+void onPlayerPositions(NetworkEvent::Packet& packet)
+{
+    uint16_t count;
+
+    packet.data >> count;
+
+}
+
 
 void Client::sendPlayerClick(float x, float y)
 {

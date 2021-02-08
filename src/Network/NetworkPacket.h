@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NetworkCommon.h"
+#include "NetworkCommands.h"
 #include "enet/enet.h"
 #include <SFML/Network/Packet.hpp>
 #include <cstdint>

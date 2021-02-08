@@ -1,8 +1,9 @@
 #include "Server.h"
-#include "../Network/NetworkCommon.h"
+#include "../Network/NetworkCommands.h"
 #include <SFML/Network/Packet.hpp>
 #include <algorithm>
 #include <iostream>
+#include "../World/World.h"
 
 namespace {
     auto findPeer(std::vector<PendingClientSession>& pendingSessions, uint32_t incomingId)
@@ -15,8 +16,9 @@ namespace {
     }
 } // namespace
 
-Server::Server()
+Server::Server(World& world)
     : m_host(MAX_CONNECTIONS, 2)
+    , mp_world(world)
 
 {
 }
@@ -97,7 +99,7 @@ int Server::createClientSession(ENetPeer* peer, uint32_t salt)
     for (unsigned i = 0; i < m_clients.size(); i++) {
         if (!m_clients[i].isActive()) {
             std::cout << "Created client session for player ID " << i << ".\n\n";
-            uint32_t playerId = i; // TODO = m_world.addEntity();
+            PlayerId_t playerId = i; // TODO = m_world.addEntity();
 
             sf::Packet broadcaster = makePacket(CommandToClient::PlayerJoined, m_salt);
             broadcaster << playerId;
@@ -176,7 +178,7 @@ void Server::onPlayerClick(NetworkEvent::Packet& packet, ENetPeer* peer)
 {
     AUTHENTICATE_PACKET
 
-    uint32_t id = 0;
+    PlayerId_t id = 0;
     float x = 0;
     float y = 0;
 

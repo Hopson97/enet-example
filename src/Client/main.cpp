@@ -5,6 +5,7 @@
 #include <SFML/Network/IpAddress.hpp>
 #include <imgui/imgui.h>
 #include <imgui_sfml/imgui-SFML.h>
+#include "../World/World.h"
 
 int main()
 {
@@ -12,7 +13,9 @@ int main()
     if (enet_initialize() != 0) {
         return EXIT_FAILURE;
     }
-    Client client;
+
+    World world;
+    Client client(world);
     if (!client.connectTo(sf::IpAddress::getLocalAddress().toString())) {
         return -1;
     }
