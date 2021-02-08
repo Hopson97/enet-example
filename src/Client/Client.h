@@ -37,6 +37,8 @@ class Client {
     void onHandshakeChallenge(NetworkEvent::Packet& packet);
     void onConnectionAcceptance(NetworkEvent::Packet& packet);
 
+    void onPlayerJoin(NetworkEvent::Packet& packet);
+
   public:
     uint32_t m_playerId;
 

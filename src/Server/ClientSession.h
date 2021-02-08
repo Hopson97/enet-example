@@ -23,9 +23,9 @@ class ClientSession {
   public:
     void init(ENetPeer* peer, uint32_t salt, uint32_t playerId);
     void disconnect();
+    void send(const sf::Packet& packet);
 
     bool verify(uint32_t salt) const;
-
     uint32_t getPlayerId() const;
     bool isActive() const;
 
@@ -34,5 +34,5 @@ class ClientSession {
     uint32_t m_salt = 0;
     uint32_t m_playerId = 0;
 
-    bool m_isActive;
+    bool m_isActive = false;
 };

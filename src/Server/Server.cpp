@@ -21,10 +21,17 @@ Server::Server()
 {
 }
 
+void Server::broadcast(const sf::Packet& packet)
+{
+    for (auto& client : m_clients) {
+        client.send(packet);
+    }
+}
+
+
 void Server::onClientConnect(ENetPeer* peer)
 {
     std::cout << "A client connected\n";
-
     PendingClientSession session;
     session.connection.handle = peer;
     m_pendingConnections.push_back(session);
@@ -38,7 +45,6 @@ void Server::onClientDisconnect(ENetPeer* peer)
         auto index = itr->second;
         m_clients[index].disconnect();
         std::cout << "A client disconnected: " << m_clients[index].getPlayerId() << ".\n";
-
         // TODO m_world.removeEntity(m_clients[index].getPlayerId());
         // TODO broadcastPlayerLeave(m_clients[index].getPlayerId());
         m_clientsMap.erase(itr);
@@ -74,11 +80,16 @@ int Server::createClientSession(ENetPeer* peer, uint32_t salt)
 {
     for (unsigned i = 0; i < m_clients.size(); i++) {
         if (!m_clients[i].isActive()) {
-            std::cout << "Created client session for player ID " << i << ".\n";
+            std::cout << "Created client session for player ID " << i << ".\n\n";
             uint32_t playerId = i; // TODO = m_world.addEntity();
+
+
+            sf::Packet broadcaster = makePacket(CommandToClient::PlayerJoined, m_salt);
+            broadcaster << playerId;
+            broadcast(broadcaster);
+
             m_clients[i].init(peer, salt, playerId);
             m_clientsMap[peer->incomingPeerID] = i;
-            // TODO broadcastPlayerJoin(playerId);
             return i;
         }
     }
@@ -110,13 +121,10 @@ void Server::handlePacket(NetworkEvent::Packet& packet, ENetPeer* peer)
 
 void Server::onHandshake(NetworkEvent::Packet& packet, ENetPeer* peer)
 {
-    std::cout << "Handshake received\n";
-
     auto itr = findPeer(m_pendingConnections, peer->incomingPeerID);
     if (itr != m_pendingConnections.end()) {
         itr->salt = packet.salt;
         itr->sendHandshakeChallenge(m_salt);
-        std::cout << "Sending handshake challenge\n";
     }
 }
 

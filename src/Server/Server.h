@@ -17,6 +17,8 @@ class Server {
     void tick();
 
   private:
+    void broadcast(const sf::Packet& packet);
+
     int createClientSession(ENetPeer* peer, uint32_t salt);
 
     void onClientConnect(ENetPeer* peer);

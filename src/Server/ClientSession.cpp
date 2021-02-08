@@ -36,6 +36,14 @@ void ClientSession::init(ENetPeer* peer, uint32_t salt, uint32_t playerId)
     m_isActive = true;
 }
 
+void ClientSession::send(const sf::Packet& packet)
+{
+    if (m_isActive) {
+       m_clientConnection.send(packet);
+    }
+}
+
+
 void ClientSession::disconnect()
 {
     if (m_isActive) {

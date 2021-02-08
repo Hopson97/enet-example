@@ -29,7 +29,6 @@ bool Client::connectTo(const std::string& ip)
 
         auto handshake = makePacket(CommandToServer::Handshake, m_salt);
         m_serverConnection.send(handshake);
-        std::cout << "Sending handshake to server.\n";
     }
     return isConnected;
 }
@@ -63,6 +62,8 @@ void Client::handlePacket(NetworkEvent::Packet& packet)
     switch (static_cast<CTC>(packet.command)) {
         case CTC::HandshakeChallenge:   onHandshakeChallenge    (packet);   break;
         case CTC::ConnectionAcceptance: onConnectionAcceptance  (packet);   break; 
+
+        case CTC::PlayerJoined:         onPlayerJoin            (packet);   break; 
     }
     // clang-format on
 }
@@ -72,7 +73,6 @@ void Client::onHandshakeChallenge(NetworkEvent::Packet& packet)
     m_salt ^= packet.salt;
     auto response = makePacket(CommandToServer::HandshakeResponse, m_salt);
     m_serverConnection.send(response);
-    std::cout << "Sending challenge response to server.\n";
 }
 
 void Client::onConnectionAcceptance(NetworkEvent::Packet& packet)
@@ -90,6 +90,15 @@ void Client::onConnectionAcceptance(NetworkEvent::Packet& packet)
         std::cerr << "Rejected connection: " << reason << ".\n";
     }
 }
+
+void Client::onPlayerJoin(NetworkEvent::Packet& packet)
+{
+    uint32_t id;
+    packet.data >> id;
+    std::cout << "Player joined with ID " << id << ".\n";
+}
+
+
 
 void Client::sendPlayerClick(float x, float y)
 {

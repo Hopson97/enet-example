@@ -56,14 +56,19 @@ enum class CommandToClient : NetworkCommand_t {
     // -- Data --
     // u8: accept (0 for no, 1 for yes)
     // (IF ACCPET)
-    // u16 playerId
+    // u32 playerId
     ConnectionAcceptance,
+
+    // Sent when a player joins
+    // -- Data --
+    // u32 The player ID
+    PlayerJoined,
 
     // Sends position of all player to the clients
     // -- Data --
-    // u16: playerCount
+    // u32: playerCount
     // [for each playerCount]:
-    // u16: playerId
+    // u32: playerId
     // f32: x
     // f32: y
     // PlayerPositions
