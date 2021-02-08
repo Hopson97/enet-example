@@ -22,6 +22,7 @@ int main()
         }
     });
 
+    std::cout << "Starting server.\n";
     Server server;
     while (isRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));

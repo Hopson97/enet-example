@@ -16,18 +16,24 @@ target_debug() {
     cd ../..
 }
 
-if [ -d "$recty" ]
+# Create folder for distribution
+if [ "$1" = "release" ]
 then
-    rm -rf -d recty
+    if [ -d "$recty" ]
+    then
+        rm -rf -d recty
+    fi
+
+    mkdir -p recty
 fi
 
-mkdir -p recty
-
+# Creates the folder for the binaries
 mkdir -p bin
 cd bin 
 mkdir -p release
 mkdir -p debug
 
+# Builds target
 if [ "$1" = "release" ]
 then
     target_release
@@ -35,8 +41,6 @@ then
     cp bin/release/recty_server recty/recty_server
 else
     target_debug
-    cp bin/debug/recty recty/recty
-    cp bin/debug/recty_server recty/recty_server
 fi
 
 cp -R res recty/res

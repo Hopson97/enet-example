@@ -1,6 +1,7 @@
 #include "Client.h"
 #include "Keyboard.h"
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Network/IpAddress.hpp>
 
 int main()
 {
@@ -9,7 +10,7 @@ int main()
     }
 
     Client client;
-    if (!client.connectTo("192.168.0.20")) {
+    if (!client.connectTo(sf::IpAddress::getLocalAddress().toString())) {
         return -1;
     }
 
