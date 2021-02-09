@@ -1,6 +1,5 @@
 #include "ClientSession.h"
 
-
 // ================================================================
 //
 //        P E N D I N G  C L I E N T    S E S S I O N

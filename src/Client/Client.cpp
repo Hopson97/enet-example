@@ -1,8 +1,8 @@
 #include "Client.h"
 
-#include <iostream>
 #include "../Network/NetworkCommands.h"
 #include "../World/World.h"
+#include <iostream>
 
 Client::Client(World& world)
     : m_host(2)
@@ -76,7 +76,6 @@ void Client::sendPlayerClick(float x, float y)
     m_serverConnection.send(packet);
 }
 
-
 // ================================================
 //
 //          PACKET HANDLING FUNCTIONS
@@ -91,9 +90,9 @@ void Client::handlePacket(NetworkEvent::Packet& packet)
         case CTC::HandshakeChallenge:   onHandshakeChallenge    (packet);   break;
         case CTC::ConnectionAcceptance: onConnectionAcceptance  (packet);   break; 
 
-        case CTC::PlayerJoined:         onPlayerJoin    (packet);   break; 
-        case CTC::ForceExit:            onForceExit     (packet);   break; 
-        case CTC::PlayerPositions:      onForceExit     (packet);   break; 
+        case CTC::PlayerJoined:         onPlayerJoin        (packet);   break; 
+        case CTC::ForceExit:            onForceExit         (packet);   break; 
+        case CTC::PlayerPositions:      onPlayerPositions   (packet);   break; 
     }
     // clang-format on
 }
@@ -137,10 +136,9 @@ void Client::onForceExit(NetworkEvent::Packet& packet)
     m_connectState = ClientConnectState::Disconnected;
 }
 
-void onPlayerPositions(NetworkEvent::Packet& packet)
+void Client::onPlayerPositions(NetworkEvent::Packet& packet)
 {
     uint16_t count;
 
     packet.data >> count;
-
 }

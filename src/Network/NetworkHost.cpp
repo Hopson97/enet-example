@@ -10,7 +10,7 @@
 // Creates a server host
 NetworkHost::NetworkHost(unsigned maxConnections, unsigned channels)
 {
-    ENetAddress address;
+    ENetAddress address{};
 
     address.host = ENET_HOST_ANY;
     address.port = DEFAULT_PORT;

@@ -1,3 +1,4 @@
+#include "../World/World.h"
 #include "Client.h"
 #include "Keyboard.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -5,7 +6,9 @@
 #include <SFML/Network/IpAddress.hpp>
 #include <imgui/imgui.h>
 #include <imgui_sfml/imgui-SFML.h>
-#include "../World/World.h"
+#include <vector>
+
+constexpr int REGION_SIZE = 200;
 
 int main()
 {
@@ -21,12 +24,35 @@ int main()
     }
 
     // Set up the window and
-    sf::RenderWindow window({1280, 720}, "SFML");
+    sf::RenderWindow window({REGION_SIZE * 7, REGION_SIZE * 5}, "SFML");
     window.setFramerateLimit(60);
     window.setKeyRepeatEnabled(false);
 
     // Start imgui
     ImGui::SFML::Init(window);
+
+    // Set up some lines
+    std::vector<sf::Vertex> regionLines;
+    for (int y = 0; y < 5; y++) {
+        sf::Vertex left;
+        sf::Vertex right;
+
+        left.position = {0, (float)(y * REGION_SIZE)};
+        right.position = {(float)window.getSize().x, (float)(y * REGION_SIZE)};
+
+        regionLines.push_back(left);
+        regionLines.push_back(right);
+    }
+    for (int x = 0; x < 7; x++) {
+        sf::Vertex left;
+        sf::Vertex right;
+
+        left.position = {(float)(x * REGION_SIZE), 0};
+        right.position = {(float)(x * REGION_SIZE), (float)window.getSize().x};
+
+        regionLines.push_back(left);
+        regionLines.push_back(right);
+    }
 
     // Start the main game loop
     Keyboard keyboard;
@@ -69,6 +95,8 @@ int main()
         // Render
         window.clear();
         ImGui::SFML::Render(window);
+
+        window.draw(regionLines.data(), regionLines.size(), sf::Lines);
         window.display();
     }
 

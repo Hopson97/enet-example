@@ -1,8 +1,8 @@
+#include "../World/World.h"
 #include "Server.h"
 #include <atomic>
 #include <iostream>
 #include <thread>
-#include "../World/World.h"
 
 int main()
 {
@@ -22,8 +22,6 @@ int main()
             }
         }
     });
-
-
 
     std::cout << "Starting server.\n";
     World world;

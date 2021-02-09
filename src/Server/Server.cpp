@@ -1,9 +1,9 @@
 #include "Server.h"
 #include "../Network/NetworkCommands.h"
+#include "../World/World.h"
 #include <SFML/Network/Packet.hpp>
 #include <algorithm>
 #include <iostream>
-#include "../World/World.h"
 
 namespace {
     auto findPeer(std::vector<PendingClientSession>& pendingSessions, uint32_t incomingId)
@@ -47,7 +47,6 @@ void Server::stop()
 // =================================================
 void Server::tick()
 {
-    
     broadcastPlayerPositions();
 
     NetworkEvent event;
@@ -66,7 +65,6 @@ void Server::tick()
         // clang-format on
     }
 }
-
 
 void Server::onClientConnect(ENetPeer* peer)
 {

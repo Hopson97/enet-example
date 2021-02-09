@@ -46,7 +46,7 @@ class Server {
   private:
     // Connections that are yet to be authorised
     std::vector<PendingClientSession> m_pendingConnections;
-  
+
     // Authorised connected clients
     std::array<ClientSession, MAX_CONNECTIONS> m_clients;
 
