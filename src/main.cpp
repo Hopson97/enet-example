@@ -14,6 +14,11 @@
 
 constexpr int REGION_SIZE = 200;
 
+// ================================================
+//
+//          S E R V E R   M A I N
+//
+// =================================================
 int serverMain()
 {
     std::atomic_bool isRunning{true};
@@ -41,6 +46,11 @@ int serverMain()
     return 0;
 }
 
+// ================================================
+//
+//          C L I E N T   M A I N
+//
+// =================================================
 int clientMain()
 {
     World world;
@@ -131,6 +141,11 @@ int clientMain()
 
 }
 
+// ================================================
+//
+//                   M A I N
+//
+// =================================================
 int main(int argc, char** argv)
 {
     // Init ENET library and connect the client
