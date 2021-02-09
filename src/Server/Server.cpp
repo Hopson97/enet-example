@@ -1,6 +1,6 @@
 #include "Server.h"
-#include "../Network/NetworkCommands.h"
-#include "../World/World.h"
+#include "../Common/NetworkCommands.h"
+#include "../Common/World.h"
 #include <SFML/Network/Packet.hpp>
 #include <algorithm>
 #include <iostream>

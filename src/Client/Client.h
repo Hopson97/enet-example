@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Network/NetworkCommands.h"
-#include "../Network/NetworkHost.h"
+#include "../Common/NetworkCommands.h"
+#include "../Common/NetworkHost.h"
 #include <enet/enet.h>
 
 struct World;

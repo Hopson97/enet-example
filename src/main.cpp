@@ -1,22 +1,48 @@
-#include "../World/World.h"
-#include "Client.h"
-#include "Keyboard.h"
+#include "Client/Client.h"
+#include "Common/World.h"
+#include "Client/Keyboard.h"
+#include "Server/Server.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Network/IpAddress.hpp>
+#include <atomic>
 #include <imgui/imgui.h>
 #include <imgui_sfml/imgui-SFML.h>
+#include <iostream>
+#include <thread>
 #include <vector>
 
 constexpr int REGION_SIZE = 200;
 
-int main()
+int serverMain()
 {
-    // Init ENET library and connect the client
-    if (enet_initialize() != 0) {
-        return EXIT_FAILURE;
+    std::atomic_bool isRunning{true};
+
+    std::thread console([&]() {
+        std::string line;
+        while (isRunning) {
+            std::cout << "Type a command.\n> ";
+            std::getline(std::cin, line);
+            if (line == "exit") {
+                isRunning = false;
+            }
+        }
+    });
+
+    std::cout << "Starting server.\n";
+    World world;
+    Server server(world);
+    while (isRunning) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        server.tick();
     }
 
+    console.join();
+    return 0;
+}
+
+int clientMain()
+{
     World world;
     Client client(world);
     if (!client.connectTo(sf::IpAddress::getLocalAddress().toString())) {
@@ -101,5 +127,36 @@ int main()
     }
 
     ImGui::SFML::Shutdown();
+    return 0;
+
+}
+
+int main(int argc, char** argv)
+{
+    // Init ENET library and connect the client
+    if (enet_initialize() != 0) {
+        return EXIT_FAILURE;
+    }
+
+    // Convert command line into std::string
+    std::vector<std::string> args;
+    for (int i = 1; i < argc; i++) {
+        if (argc > 1) {
+            std::cout << args.emplace_back(argv[i]) << std::endl;
+        }
+    }
+
+    if (args.size() > 0) {
+        if (args[0] == "client") {
+            clientMain();
+        }
+        else if (args[0] == "server") {
+            serverMain();
+        }
+        else if (args[0] == "both") {
+            // BOTH????
+        }
+    }
+
     enet_deinitialize();
 }

@@ -4,22 +4,26 @@ cmake_minimum_required(VERSION 3.10)
 project(recty VERSION 1.0)
 
 #Set executable for server
-add_executable(recty_server   
-    src/Network/NetworkHost.cpp
 
-    src/Server/Server.cpp
-    src/Server/ClientSession.cpp
-
-    src/Server/server_main.cpp
-)
+#add_executable(recty_server   
+#    src/Common/NetworkHost.cpp
+#
+#    src/Server/Server.cpp
+#    src/Server/ClientSession.cpp
+#
+#    src/Server/server_main.cpp
+#)
 
 #Set executable for client
 add_executable(recty
-    src/Network/NetworkHost.cpp
+    src/Server/Server.cpp
+    src/Server/ClientSession.cpp
+    
+    src/Common/NetworkHost.cpp
 
     src/Client/Client.cpp
 
-    src/Client/main.cpp
+    src/main.cpp
 )
 
 #Set module path
@@ -56,17 +60,17 @@ function(setup_target TARGET)
     )
 endfunction(setup_target)
 
-setup_target(recty_server)
+#setup_target(recty_server)
 setup_target(recty)
 
 #Finally
-target_link_libraries(recty_server
-    enet
-    lua
-    Threads::Threads 
-    ${SFML_LIBRARIES}
-    ${SFML_DEPENDENCIES}
-)
+#target_link_libraries(recty_server
+#    enet
+#    lua
+#    Threads::Threads 
+#    ${SFML_LIBRARIES}
+#    ${SFML_DEPENDENCIES}
+#)
 
 target_link_libraries(recty
     enet

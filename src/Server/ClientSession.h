@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Network/NetworkHost.h"
+#include "../Common/NetworkHost.h"
 
 /**
  * @brief A pending client session as stored on the server

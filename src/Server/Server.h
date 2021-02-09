@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Network/NetworkHost.h"
-#include "../World/World.h"
+#include "../Common/NetworkHost.h"
+#include "../Common/World.h"
 #include "ClientSession.h"
 #include <array>
 #include <atomic>
