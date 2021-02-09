@@ -1,6 +1,6 @@
 #include "Client/Client.h"
-#include "Common/World.h"
 #include "Client/Keyboard.h"
+#include "Common/World.h"
 #include "Server/Server.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -138,7 +138,6 @@ int clientMain()
 
     ImGui::SFML::Shutdown();
     return 0;
-
 }
 
 // ================================================
@@ -163,14 +162,17 @@ int main(int argc, char** argv)
 
     if (args.size() > 0) {
         if (args[0] == "client") {
-            clientMain();
+            return clientMain();
         }
         else if (args[0] == "server") {
-            serverMain();
+            return serverMain();
         }
-        else if (args[0] == "both") {
-            // BOTH????
-        }
+    }
+    else {
+        std::thread t([]() { serverMain(); });
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        clientMain();
+        t.join();
     }
 
     enet_deinitialize();
